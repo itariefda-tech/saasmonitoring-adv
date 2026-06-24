@@ -1,628 +1,437 @@
+# README.md
+
 # SaaS Billboard Monitoring & Report Platform
 
-## 1. Gambaran Umum Produk
+Aplikasi ini adalah platform monitoring dan reporting untuk perusahaan billboard / outdoor advertising. Sistem menggunakan CCTV atau Computer Vision Camera untuk membaca kondisi lalu lintas di sekitar titik billboard, mengolah data kendaraan menjadi analytics, lalu menyajikannya dalam dashboard, KPI card, proof of display, dan report harian, mingguan, serta bulanan.
 
-Aplikasi ini adalah platform **SaaS multi-tenant** untuk perusahaan billboard / outdoor advertising 
-yang ingin memberikan dashboard monitoring dan laporan performa iklan kepada client berbasis data.
+Produk ini dirancang sebagai **multi-tenant SaaS**, bukan aplikasi custom satu perusahaan. Satu platform pusat dapat dipakai oleh banyak perusahaan billboard, dengan data yang wajib terpisah aman antar-tenant.
 
-Sistem menggunakan CCTV / Computer Vision Camera yang dipasang di area billboard untuk membaca kondisi lalu lintas, 
-menghitung kendaraan, mengklasifikasi jenis kendaraan, menghitung estimasi potensi exposure, menyediakan bukti billboard tayang, dan menghasilkan report harian, mingguan, serta bulanan.
+Tujuan akhirnya sederhana tetapi besar:
 
-Produk ini bukan aplikasi CCTV biasa.
+> Membantu perusahaan billboard menjual titik iklan dengan bukti data, bukan hanya klaim “lokasi ramai dan strategis”.
 
-Produk ini adalah gabungan dari:
-
-* SaaS platform,
-* billboard inventory system,
-* campaign management,
-* CCTV / CVC monitoring,
-* AI traffic analytics,
-* proof of display,
-* client dashboard,
-* report generator,
-* data quality control,
-* formula transparency,
-* mobile-first client experience.
-
-Arah produk wajib tetap:
-
-**Billboard + CCTV / CVC + AI Traffic Analytics + Proof Display + Client Dashboard + Report Automation + SaaS Multi-Tenant Platform.**
+Billboard bukan lagi hanya papan besar di pinggir jalan. Billboard harus menjadi aset media yang dapat dimonitor, diukur, dilaporkan, dan dipertanggungjawabkan.
 
 ---
 
-## 2. Tujuan Utama Aplikasi
+# 1. Latar Belakang Produk
 
-Tujuan utama aplikasi ini adalah membantu perusahaan billboard menjual titik iklan dengan data, bukan hanya klaim lokasi ramai.
+Perusahaan billboard sering menjual titik iklan dengan narasi:
 
-Billboard tidak lagi hanya dijual dengan kalimat:
+* lokasi strategis,
+* jalan ramai,
+* dekat pusat bisnis,
+* dekat mall,
+* dekat perkantoran,
+* dekat pemukiman,
+* potensi dilihat banyak orang.
 
-> Lokasi strategis, ramai, banyak dilihat orang.
+Masalahnya, klaim seperti itu sering tidak punya data operasional yang kuat.
 
-Tetapi harus bisa dibuktikan dengan data seperti:
+Aplikasi ini dibuat agar perusahaan billboard dapat menunjukkan data seperti:
 
 * jumlah kendaraan yang lewat,
-* jenis kendaraan yang lewat,
+* jenis kendaraan yang dominan,
 * jam paling ramai,
-* jam paling macet,
+* hari paling ramai,
+* jam macet,
 * rata-rata kecepatan kendaraan,
-* estimasi potensi iklan terlihat,
-* bukti billboard sedang tayang,
-* kualitas data CCTV,
+* congestion level,
+* estimated exposure,
+* proof billboard sedang tayang,
 * performa campaign,
-* report yang bisa dibaca client dari HP.
+* report siap kirim ke client.
 
-Aplikasi ini harus membantu perusahaan billboard meningkatkan kepercayaan client dan calon client melalui data yang rapi, transparan, dan bisa diaudit.
+Dengan sistem ini, perusahaan billboard dapat berkata:
 
----
+> “Ini bukan cuma lokasi ramai. Ini data traffic-nya, ini komposisi kendaraan, ini jam puncaknya, ini report-nya, ini bukti tayangnya.”
 
-## 3. Prinsip Produk
-
-Produk ini harus dibangun sebagai **SaaS serius**, bukan aplikasi custom satu perusahaan.
-
-Prinsip utama:
-
-* multi-tenant sejak awal,
-* tenant isolation wajib keras,
-* role dan permission harus jelas,
-* report tidak boleh overclaim,
-* formula impression harus transparan,
-* data traffic wajib punya kualitas dan confidence,
-* dashboard client wajib mobile-first,
-* report PDF harus professional dan client-friendly,
-* hourly/raw data boleh lengkap, tetapi sebaiknya ditempatkan sebagai appendix atau export Excel/CSV,
-* AI tidak boleh mengarang angka,
-* developer / agent tidak boleh meninggalkan mock permanen.
-
-Billboard yang sebelumnya hanya menjadi media statis harus berubah menjadi aset media yang:
-
-* bisa dimonitor,
-* bisa diukur,
-* bisa dilaporkan,
-* bisa dibandingkan,
-* bisa dijual dengan data,
-* bisa dipertanggungjawabkan.
+Itu baru jualan yang punya tulang punggung. Bukan sekadar brosur manis beraroma Excel.
 
 ---
 
-## 4. Model Bisnis SaaS
+# 2. Benchmark Fitur dari Manual ADX
 
-Aplikasi ini menggunakan model **multi-tenant SaaS**.
+Manual ADX Traffic Counting menjadi benchmark awal untuk alur dashboard. Dari manual tersebut, fitur dasar yang wajib dijadikan acuan adalah:
 
-Artinya:
+* login dashboard,
+* tampilan awal setelah login,
+* menu Analytics,
+* rekap data traffic counting,
+* filter tampilan per hari / minggu / bulan,
+* filter lokasi kamera,
+* filter periode pengukuran,
+* export report PDF / CSV / Excel,
+* menu Profile,
+* menu Logout,
+* menu Device,
+* akses live streaming traffic counting,
+* pembatasan sesi live streaming,
+* dokumentasi lokasi kamera / billboard.
 
-* satu platform pusat,
-* banyak perusahaan billboard dapat menggunakan aplikasi,
-* setiap perusahaan billboard disebut tenant,
-* setiap tenant memiliki data sendiri,
-* setiap tenant memiliki user sendiri,
-* setiap tenant memiliki client sendiri,
-* setiap tenant memiliki billboard sendiri,
-* setiap tenant memiliki campaign sendiri,
-* data antar tenant tidak boleh tercampur,
-* Owner Platform SaaS mengelola tenant dan paket/tier,
-* Admin Tenant mengelola operasional tenant,
-* Owner Tenant hanya melihat dashboard, KPI, rekap, insight, dan report.
+Namun, aplikasi ini tidak boleh meniru mentah-mentah standar keamanan lama seperti:
 
-Contoh struktur:
+* credential ditulis di dokumen,
+* password default sama dengan email,
+* raw RTSP link diekspos langsung,
+* user diminta copy link streaming ke VLC,
+* akses live streaming tanpa audit yang kuat.
+
+Manual ADX dipakai sebagai **benchmark fitur**, bukan benchmark keamanan final.
+
+Aplikasi kita harus naik kelas:
 
 ```text
-Platform SaaS
-├── Owner Platform SaaS
-│
-├── Tenant A: Perusahaan Billboard A
-│   ├── Admin Tenant A
-│   ├── Owner Tenant A
-│   ├── Sales A
-│   ├── Teknisi A
-│   ├── Client / Brand A1
-│   ├── Client / Brand A2
-│   ├── Billboard A1
-│   └── Campaign A1
-│
-├── Tenant B: Perusahaan Billboard B
-│   ├── Admin Tenant B
-│   ├── Owner Tenant B
-│   ├── Sales B
-│   ├── Teknisi B
-│   ├── Client / Brand B1
-│   ├── Billboard B1
-│   └── Campaign B1
-│
-└── Tenant C: Perusahaan Billboard C
-    ├── Admin Tenant C
-    ├── Owner Tenant C
-    ├── Client / Brand C1
-    └── Billboard C1
-```
-
-Sistem tidak boleh dibangun sebagai aplikasi satu perusahaan saja.
-
-Semua struktur backend, database, permission, dashboard, report, file storage, API, background job, 
-dan audit log wajib mempertimbangkan tenant isolation sejak awal.
-
----
-
-## 5. Role Utama Aplikasi
-
-Bagian ini adalah pondasi. Jangan dibolak-balik.
-
-Role utama yang benar:
-
-```text
-Owner Platform SaaS
-↓
-Admin Tenant — Super Power Operasional Tenant
-↓
-Owner Tenant — Monitoring Only
-↓
-Sales / Teknisi / Client
+ADX Basic Dashboard
++
+SaaS Multi-Tenant
++
+Role-Based Access Control
++
+Secure Live Streaming
++
+Report Center
++
+Proof of Display
++
+Data Quality Score
++
+Confidence Score
++
+Audit Trail
++
+Client Mobile Dashboard
 ```
 
 ---
 
-### 5.1 Owner Platform SaaS
+# 3. Target Produk
 
-Owner Platform SaaS adalah pemilik aplikasi/platform SaaS secara keseluruhan.
+Platform ini harus mampu menghasilkan:
 
-Role ini menggantikan istilah lama:
+* dashboard realtime,
+* dashboard executive,
+* dashboard client mobile-first,
+* monitoring CCTV,
+* analytics traffic,
+* vehicle counting,
+* vehicle classification,
+* campaign monitoring,
+* proof of display,
+* report PDF,
+* export Excel,
+* export CSV,
+* report history,
+* report approval,
+* data quality monitoring,
+* audit log.
 
-```text
-Super Admin Platform
-```
+Target aplikasi bukan cuma menampilkan angka.
 
-Mulai sekarang, gunakan istilah:
+Target aplikasi adalah membuat angka itu:
 
-```text
-Owner Platform SaaS
-```
+* jelas sumbernya,
+* jelas rumusnya,
+* jelas validitasnya,
+* jelas siapa yang boleh melihat,
+* jelas siapa yang membuat report,
+* jelas kapan data digenerate,
+* jelas apakah data raw, validated, atau estimated.
+
+Kalau angka tidak bisa dijelaskan, angka itu bukan insight. Itu cuma hiasan dashboard.
+
+---
+
+# 4. Prinsip Utama Produk
+
+Prinsip yang wajib dipegang:
+
+* Multi-tenant sejak awal.
+* Tenant isolation wajib keras.
+* Role dan permission harus jelas.
+* Client hanya melihat campaign miliknya.
+* Owner Tenant hanya monitoring.
+* Admin Tenant mengelola operasional tenant.
+* Owner Platform SaaS mengelola tenant, tier, subscription, dan platform.
+* CCTV dan aplikasi dianggap satu ekosistem.
+* Dashboard client wajib mobile-first.
+* Web admin dipakai untuk pengelolaan data besar.
+* Report harus mudah dipahami client.
+* Report harus punya metodologi.
+* Jangan overclaim data exposure.
+* Semua aksi penting wajib masuk audit log.
+* Jangan menyimpan credential mentah.
+* Jangan expose raw RTSP ke client.
+* Jangan membangun fitur cantik tetapi permission bocor.
+
+Prinsip galak:
+
+> Dashboard boleh cantik, tapi kalau role kacau, itu bukan SaaS. Itu pasar malam digital.
+
+---
+
+# 5. Role Utama
+
+## 5.1 Owner Platform SaaS
+
+Owner Platform SaaS adalah pemilik aplikasi / platform SaaS secara keseluruhan.
+
+Role ini menggantikan istilah lama **Super Admin Platform**.
 
 Owner Platform SaaS bukan bagian dari tenant billboard tertentu. Ia adalah pemilik dan pengendali utama platform.
 
 Tugas utama:
 
-* mengelola seluruh tenant/perusahaan billboard,
-* membuat tenant baru,
-* mengaktifkan atau menonaktifkan tenant,
-* membuat dan mengatur paket subscription/tier,
-* mengatur limit paket seperti jumlah billboard, CCTV, user, report, dan fitur analytics,
+* mengelola semua tenant / perusahaan billboard,
+* membuat dan mengatur paket berlangganan / tier,
+* mengatur limit paket,
+* mengatur jumlah billboard per paket,
+* mengatur jumlah CCTV per paket,
+* mengatur jumlah user per paket,
+* mengatur fitur report per paket,
+* mengatur fitur analytics per paket,
 * melakukan approval tenant baru jika diperlukan,
+* memonitor seluruh sistem,
 * melihat status subscription tenant,
+* mengontrol aktif / nonaktif tenant,
 * mengatur billing dan subscription,
-* mengontrol fitur yang aktif pada masing-masing tier,
-* memonitor kesehatan sistem secara global,
-* memonitor status semua device secara global,
 * melihat audit log platform,
 * mengatur konfigurasi global aplikasi,
-* memantau usage API, storage, report generation, dan AI processing.
+* memonitor kesehatan sistem global,
+* mengontrol feature flags / fitur per tier.
 
-Owner Platform SaaS boleh melihat data platform untuk kebutuhan support, audit, security, 
-dan operasional platform. Namun akses detail bisnis tenant harus tetap dibatasi dengan audit log dan alasan akses.
+Owner Platform SaaS adalah level tertinggi dalam platform.
 
-Owner Platform SaaS fokus pada:
-
-* kesehatan platform,
-* bisnis SaaS,
-* tenant management,
-* subscription/tier,
-* system health,
-* security,
-* audit.
-
-Owner Platform SaaS bukan operator harian tenant.
+Owner Platform SaaS tidak boleh diperlakukan sebagai Admin Tenant biasa.
 
 ---
 
-### 5.2 Admin Tenant — Super Power Operasional Tenant
+## 5.2 Admin Tenant
 
-Admin Tenant adalah admin utama di masing-masing perusahaan billboard.
+Admin Tenant adalah admin utama di perusahaan billboard yang memakai platform.
 
-Role ini adalah role paling kuat di dalam lingkup tenant/perusahaan billboard.
+Role ini adalah role paling kuat di dalam tenant.
 
 Tugas utama:
 
 * mengelola data perusahaan billboard miliknya,
 * mengelola user internal tenant,
 * mengelola billboard,
-* mengelola sisi/muka billboard,
+* mengelola sisi / muka billboard,
 * mengelola CCTV,
-* mengelola edge device,
-* mengelola client/brand penyewa billboard,
+* mengelola client / brand penyewa billboard,
 * membuat dan mengelola campaign,
 * mengatur akses dashboard client,
-* upload proof display,
-* approval proof display,
+* upload dan approval proof of display,
 * melihat traffic analytics,
 * generate dan download report,
 * mengelola teknisi,
 * melihat alert dan maintenance,
 * mengatur konfigurasi operasional tenant.
 
-Admin Tenant hanya berkuasa di dalam tenant miliknya sendiri.
+Admin Tenant hanya berkuasa di tenant sendiri.
 
 Admin Tenant tidak boleh:
 
 * melihat data tenant lain,
 * mengubah data tenant lain,
-* mengakses subscription global platform,
-* membuat paket/tier SaaS,
-* mengubah konfigurasi global platform,
-* mengambil alih role Owner Platform SaaS.
+* mengatur paket SaaS global,
+* mengubah subscription global platform,
+* mengubah konfigurasi global platform.
 
-Admin Tenant adalah raja operasional di tenant sendiri, tapi tetap tidak boleh loncat pagar ke kerajaan tenant lain.
+Admin Tenant adalah “raja operasional” di kerajaannya sendiri, tapi tetap tidak boleh lompat pagar ke kerajaan tenant lain.
 
 ---
 
-### 5.3 Owner Tenant — Monitoring Only
+## 5.3 Owner Tenant
 
 Owner Tenant adalah pemilik atau pimpinan perusahaan billboard yang menggunakan platform.
 
-Role ini **bukan super admin** dan **bukan admin operasional**.
+Role ini bukan admin operasional.
 
-Owner Tenant tidak perlu punya power untuk membuat, mengubah, menghapus, approval, atau mengatur user.
-
-Owner Tenant hanya membutuhkan:
+Owner Tenant hanya membutuhkan akses:
 
 * monitoring,
 * KPI card,
-* rekap bisnis,
-* insight,
-* dashboard eksekutif,
-* report.
+* rekap,
+* insight bisnis,
+* report,
+* performa traffic,
+* status campaign,
+* status CCTV.
 
-Akses Owner Tenant:
+Owner Tenant boleh melihat:
 
-* melihat dashboard ringkasan perusahaan,
-* melihat KPI card utama,
-* melihat total billboard,
-* melihat total billboard aktif,
-* melihat total billboard face,
-* melihat total campaign aktif,
-* melihat total client aktif,
-* melihat CCTV online/offline,
-* melihat performa traffic secara ringkas,
-* melihat report harian, mingguan, dan bulanan,
-* melihat campaign hampir selesai,
-* melihat billboard dengan traffic tertinggi,
-* melihat estimasi potential exposure,
-* melihat insight bisnis,
-* melihat trend performa,
-* download report jika diizinkan.
+* dashboard ringkasan perusahaan,
+* KPI utama,
+* total billboard,
+* billboard aktif,
+* campaign aktif,
+* client aktif,
+* CCTV online / offline,
+* performa traffic ringkas,
+* report harian / mingguan / bulanan,
+* campaign hampir selesai,
+* billboard traffic tertinggi,
+* estimated exposure,
+* insight bisnis,
+* report download jika diizinkan.
 
-Larangan Owner Tenant:
+Owner Tenant tidak boleh:
 
-* tidak boleh membuat billboard,
-* tidak boleh mengubah billboard,
-* tidak boleh menghapus billboard,
-* tidak boleh membuat campaign,
-* tidak boleh mengubah campaign,
-* tidak boleh menghapus campaign,
-* tidak boleh mengatur user,
-* tidak boleh mengatur role,
-* tidak boleh mengatur CCTV,
-* tidak boleh approval proof display,
-* tidak boleh mengubah data client,
-* tidak boleh mengubah subscription atau paket,
-* tidak boleh mengakses data tenant lain,
-* tidak boleh melihat konfigurasi global platform.
+* membuat billboard,
+* mengubah billboard,
+* menghapus billboard,
+* membuat campaign,
+* mengubah campaign,
+* menghapus campaign,
+* mengatur user,
+* mengatur role,
+* mengatur CCTV,
+* approval proof display,
+* mengubah data client,
+* mengubah subscription,
+* mengakses data tenant lain.
 
-Owner Tenant adalah role eksekutif / monitoring.
+Owner Tenant adalah executive monitoring.
 
 Bahasa sederhananya:
 
 > Boleh melihat ruang komando, tapi tidak boleh menekan tombol nuklir.
 
-Dashboard Owner Tenant harus bersih, eksekutif, ringkas, dan mudah dipahami.
+---
 
-Tidak ada tombol berbahaya seperti:
+## 5.4 Sales Tenant
 
-* tambah data,
-* edit data,
-* delete data,
-* approval,
-* ubah role,
-* ubah konfigurasi.
+Sales adalah user tenant yang fokus pada aktivitas penjualan billboard dan campaign.
+
+Tugas:
+
+* melihat data billboard yang tersedia,
+* melihat performa ringkas billboard untuk bahan jualan,
+* melihat data client miliknya,
+* membuat draft campaign jika diberi izin,
+* melihat report campaign miliknya,
+* membantu client memahami performa campaign.
+
+Sales tidak boleh punya akses penuh seperti Admin Tenant.
 
 ---
 
-### 5.4 Sales Tenant
+## 5.5 Teknisi Lapangan
 
-Sales adalah user internal tenant yang fokus pada aktivitas penjualan billboard dan campaign.
+Teknisi adalah user untuk pemasangan, pengecekan, dan maintenance perangkat lapangan.
 
-Tugas utama:
-
-* melihat daftar titik billboard,
-* melihat billboard yang tersedia,
-* melihat performa historis billboard,
-* melihat estimasi traffic,
-* melihat composition kendaraan sebagai bahan jualan,
-* menyiapkan bahan penawaran,
-* membandingkan titik billboard,
-* melihat client yang menjadi tanggung jawabnya,
-* membuat proposal/campaign draft jika diizinkan,
-* melihat report campaign miliknya jika diberikan akses.
-
-Sales tidak boleh:
-
-* mengubah data teknis penting tanpa izin,
-* menghapus billboard,
-* mengatur CCTV,
-* approval proof display,
-* mengubah role user,
-* melihat semua data bisnis tenant tanpa batas,
-* mengakses data tenant lain.
-
-Sales adalah alat bantu jualan berbasis data, bukan admin kerajaan.
-
----
-
-### 5.5 Teknisi Lapangan
-
-Teknisi adalah user untuk pemasangan, pengecekan, dan maintenance perangkat di lapangan.
-
-Tugas utama:
+Tugas:
 
 * memasang CCTV,
-* mengecek kamera,
-* update status kamera,
-* upload foto bukti pemasangan iklan,
-* upload foto maintenance,
-* update status lokasi,
-* melaporkan kendala perangkat,
-* melakukan checklist lapangan,
+* upload foto pemasangan,
+* cek status kamera,
+* update maintenance,
+* melaporkan kendala lapangan,
+* upload foto lokasi,
+* mengisi checklist teknis,
 * mencatat hasil perbaikan,
-* mengirim GPS timestamp bila diperlukan.
+* upload proof lapangan jika diberi akses.
 
-Teknisi menggunakan aplikasi mobile atau web mobile.
-
-Teknisi tidak boleh:
-
-* melihat data revenue,
-* melihat semua client,
-* mengubah campaign,
-* menghapus billboard,
-* generate report bisnis,
-* mengatur role,
-* mengakses data tenant lain.
-
-Teknisi fokus pada bukti lapangan dan kesehatan perangkat.
+Teknisi tidak boleh mengakses data bisnis tenant secara luas.
 
 ---
 
-### 5.6 Client / Brand Penyewa Billboard
+## 5.6 Client / Brand
 
-Client adalah user akhir yang menyewa billboard dan ingin melihat performa campaign miliknya.
+Client adalah pihak penyewa billboard yang ingin melihat performa campaign miliknya.
 
-Client hanya boleh mengakses:
+Client boleh melihat:
 
 * campaign miliknya,
-* billboard yang sedang disewa,
 * KPI campaign,
-* traffic report,
+* grafik traffic,
 * proof display yang sudah approved,
-* laporan harian,
-* laporan mingguan,
-* laporan bulanan,
-* download PDF/Excel jika diizinkan.
+* report harian,
+* report mingguan,
+* report bulanan,
+* download report jika diizinkan,
+* live view jika permission diaktifkan.
 
 Client tidak boleh melihat:
 
 * campaign client lain,
-* data tenant secara penuh,
-* revenue perusahaan billboard,
+* data tenant penuh,
+* billing tenant,
 * konfigurasi CCTV,
-* data internal tenant,
-* data teknisi,
-* data subscription tenant,
-* dashboard Owner Tenant,
-* dashboard Admin Tenant.
+* raw RTSP,
+* user internal tenant,
+* data report client lain.
 
-Client dashboard wajib mobile-first karena mayoritas client akan membuka dari HP.
+Client dashboard wajib mobile-first.
 
 ---
 
-## 6. Permission Matrix Ringkas
+# 6. Modul Utama Aplikasi
 
-| Role                | Platform/Tier |    Tenant Ops |     Billboard |               CCTV |      Campaign |      Proof Display |        Report |          Monitoring |
-| ------------------- | ------------: | ------------: | ------------: | -----------------: | ------------: | -----------------: | ------------: | ------------------: |
-| Owner Platform SaaS |          Full | Support/Audit | Support/Audit |      Support/Audit | Support/Audit |      Support/Audit |  Global Usage |         Full Global |
-| Admin Tenant        |            No |   Full Tenant |          Full |               Full |          Full |      Full Approval |   Full Tenant |         Full Tenant |
-| Owner Tenant        |            No |     Read Only |     Read Only |          Read Only |     Read Only |          Read Only | Read/Download | Full Tenant Summary |
-| Sales               |            No |       Limited |          Read |         No/Limited | Draft/Limited |                 No |       Limited |          Sales View |
-| Teknisi             |            No |       Limited | Read Assigned | Update Maintenance |            No | Upload Field Proof |    No/Limited |      Technical View |
-| Client              |            No |            No | Campaign Only |        Status Only | Campaign Only |      Approved Only | Campaign Only |    Client Dashboard |
+## 6.1 Tenant Management
 
-Prinsip keras:
+Untuk mengelola perusahaan billboard yang menjadi pelanggan SaaS.
 
-* Owner Tenant bukan Admin Tenant.
-* Admin Tenant bukan Owner Platform SaaS.
-* Client bukan tenant staff.
-* Teknisi bukan sales.
-* Sales bukan teknisi.
-* Semua role harus dibatasi permission, bukan sekadar nama indah di sidebar.
+Akses:
 
----
-
-## 7. Kategori Paket Billboard Berdasarkan Lokasi
-
-Sistem harus mendukung beberapa kategori paket berdasarkan kondisi lokasi billboard.
-
----
-
-### 7.1 Paket Jalan Tol
-
-Untuk billboard di jalan tol atau jalan cepat satu arah.
-
-Karakteristik:
-
-* umumnya satu arah kendaraan,
-* kecepatan kendaraan tinggi,
-* satu CCTV utama biasanya cukup,
-* cocok untuk vehicle counting,
-* cocok untuk speed rate,
-* komposisi kendaraan biasanya lebih banyak mobil dan truk,
-* motor bisa sangat rendah atau tidak ada tergantung ruas jalan.
-
-Data utama:
-
-* total kendaraan,
-* car count,
-* motorcycle count,
-* bus count,
-* truck count,
-* average speed,
-* peak hour,
-* traffic per jam,
-* estimated exposure,
-* CPV,
-* CPI.
-
----
-
-### 7.2 Paket Jalan Biasa / JPO / Satu Muka
-
-Untuk billboard jalan biasa, flyover, JPO, atau jalan utama satu arah.
-
-Karakteristik:
-
-* kendaraan lebih variatif,
-* banyak motor,
-* potensi macet tinggi,
-* billboard sering terlihat lebih lama saat padat,
-* cocok untuk mass awareness campaign.
-
-Data utama:
-
-* total kendaraan,
-* motor/mobil/bus/truk,
-* jam ramai,
-* congestion level,
-* dwell time,
-* proof display,
-* daily/weekly/monthly report.
-
----
-
-### 7.3 Paket Perempatan / Pertigaan / Perlimaan
-
-Untuk billboard yang terlihat dari banyak arah.
-
-Karakteristik:
-
-* kendaraan datang dari beberapa arah,
-* bisa membutuhkan lebih dari satu CCTV,
-* perlu mapping arah kendaraan,
-* potensi double count harus dikendalikan,
-* perlu exposure zone per arah.
-
-Data utama:
-
-* traffic per arah,
-* vehicle count per arah,
-* vehicle class per arah,
-* congestion per arah,
-* exposure zone per arah,
-* report per sisi/muka billboard,
-* anti double count rule.
-
----
-
-### 7.4 Paket Premium Landmark
-
-Untuk billboard besar, strategis, dan bernilai tinggi.
-
-Karakteristik:
-
-* titik premium,
-* volume traffic tinggi,
-* client membutuhkan report lebih mewah,
-* cocok untuk dashboard dan insight premium.
-
-Data utama:
-
-* multi-camera analytics,
-* advanced report,
-* proof display lengkap,
-* historical comparison,
-* estimated exposure score,
-* executive recommendation,
-* cross-location comparison,
-* data integrity page.
-
----
-
-## 8. Modul Utama Aplikasi
-
----
-
-### Modul 1 — Tenant Management
-
-Modul untuk mengelola perusahaan billboard yang menjadi pelanggan SaaS.
-
-Modul ini hanya boleh diakses oleh Owner Platform SaaS.
+* Owner Platform SaaS.
 
 Fitur:
 
-* tambah tenant/perusahaan billboard,
-* edit data tenant,
-* aktif/nonaktif tenant,
-* approval tenant baru,
+* tambah tenant,
+* edit tenant,
+* aktif / nonaktif tenant,
+* subscription tenant,
+* paket / tier,
+* batas jumlah billboard,
+* batas jumlah CCTV,
+* batas jumlah user,
+* batas fitur analytics,
+* batas fitur report,
 * tenant branding,
-* tenant status,
 * audit tenant,
-* package assignment,
-* subscription status,
-* billing status,
-* suspend tenant jika bermasalah.
+* status pembayaran,
+* suspend tenant jika diperlukan.
 
 ---
 
-### Modul 2 — Subscription Plan / Tier Management
+## 6.2 Subscription / Tier Management
 
-Modul untuk mengatur paket SaaS.
-
-Modul ini hanya milik Owner Platform SaaS.
-
-Fitur:
-
-* membuat paket/tier,
-* mengatur harga paket,
-* mengatur limit billboard,
-* mengatur limit CCTV,
-* mengatur limit user,
-* mengatur fitur yang aktif,
-* mengatur jenis report,
-* mengatur fitur analytics,
-* mengatur masa aktif subscription,
-* upgrade/downgrade tenant,
-* suspend tenant jika pembayaran bermasalah.
+Untuk mengatur paket SaaS.
 
 Contoh tier:
 
-* Starter
-* Growth
-* Pro
-* Enterprise
-* Custom Premium
+* Starter,
+* Growth,
+* Pro,
+* Enterprise,
+* Custom Premium.
 
-Contoh limit tier:
+Parameter paket:
 
+* harga,
+* masa aktif,
 * jumlah billboard,
-* jumlah billboard face,
 * jumlah CCTV,
-* jumlah user internal,
-* jumlah client dashboard,
+* jumlah user,
+* jumlah client access,
 * report PDF,
-* report Excel,
+* export Excel,
+* export CSV,
+* live view,
 * data retention,
 * advanced analytics,
-* white label,
-* custom branding.
+* data quality score,
+* anomaly detection,
+* white label report.
 
 ---
 
-### Modul 3 — User & Role Management
+## 6.3 User & Role Management
 
-Modul untuk mengatur user dan hak akses.
+Untuk mengatur user dan hak akses.
 
 Role utama:
 
@@ -631,27 +440,22 @@ Role utama:
 * Owner Tenant,
 * Sales,
 * Teknisi,
-* Client / Brand,
-* Viewer / Report Viewer jika nanti dibutuhkan.
+* Client,
+* Viewer / Report Viewer jika dibutuhkan.
 
-Prinsip role:
+Prinsip:
 
-* Owner Platform SaaS mengatur tenant dan tier.
-* Admin Tenant mengatur operasional tenant.
-* Owner Tenant hanya monitoring.
-* Sales fokus data penjualan dan campaign.
-* Teknisi fokus maintenance.
-* Client hanya melihat campaign miliknya.
-* Semua role wajib mengikuti tenant isolation.
-* Semua aksi penting wajib masuk audit log.
+* permission tidak boleh hanya mengandalkan nama role,
+* semua endpoint harus dicek permission,
+* semua menu sidebar harus role-based,
+* semua aksi penting masuk audit log,
+* semua query tenant wajib difilter tenant_id.
 
 ---
 
-### Modul 4 — Billboard Management
+## 6.4 Billboard Management
 
-Modul untuk mengelola data billboard.
-
-Modul ini dikelola oleh Admin Tenant.
+Untuk mengelola data billboard.
 
 Data utama:
 
@@ -664,181 +468,113 @@ Data utama:
 * provinsi,
 * ukuran,
 * tipe billboard,
-* sisi/muka billboard,
+* road type,
+* sisi / muka billboard,
 * arah hadap,
 * visibility angle,
-* kategori lokasi,
 * foto lokasi,
+* monthly rate / estimated OOH budget,
 * status aktif,
-* monthly rate / estimated OOH rate jika digunakan untuk report,
 * kategori paket.
-
-Data billboard wajib mendukung lebih dari satu sisi/muka.
-
-Contoh:
-
-```text
-Billboard A
-├── Face 1 arah Jakarta
-└── Face 2 arah Tangerang
-
-Billboard B
-├── Face Utara
-└── Face Selatan
-```
-
-Owner Tenant boleh melihat data billboard, tetapi tidak boleh mengubah.
 
 ---
 
-### Modul 5 — Camera & Device Management
+## 6.5 Camera / Device Management
 
-Modul untuk mengelola CCTV, CVC, dan perangkat edge.
+Untuk mengelola CCTV atau Computer Vision Camera.
 
 Data utama:
 
 * camera ID,
-* device ID,
 * nama kamera,
-* lokasi kamera,
 * billboard terkait,
-* billboard face terkait,
-* RTSP/IP camera,
-* stream URL,
-* camera position,
-* direction captured,
+* lokasi kamera,
+* stream URL encrypted,
+* stream proxy URL,
+* RTSP/IP camera internal,
+* status online / offline,
+* last heartbeat,
+* stream quality,
 * FPS,
 * resolution,
-* status online/offline,
-* last heartbeat,
-* last data received,
-* stream health,
-* kualitas stream,
+* latency,
+* device ID,
+* health score,
 * catatan maintenance.
 
-Admin Tenant boleh mengelola kamera.
+Catatan penting:
 
-Teknisi boleh update status lapangan dan maintenance.
-
-Owner Tenant hanya boleh melihat status ringkas.
-
-Client hanya boleh melihat status CCTV yang terkait campaign miliknya jika diizinkan.
-
-CCTV merupakan bagian dari produk, sehingga sistem wajib memantau kesehatan kamera secara serius.
+* raw RTSP tidak boleh ditampilkan ke client.
+* live streaming harus lewat secure streaming proxy.
+* akses live streaming harus memakai token/session.
+* live view harus dicatat di audit log.
 
 ---
 
-### Modul 6 — Campaign Management
+## 6.6 Campaign Management
 
-Modul untuk mengelola campaign iklan client.
+Untuk mengelola campaign iklan client.
 
 Data utama:
 
 * campaign ID,
 * client ID,
-* nama campaign,
 * brand,
-* objective,
+* campaign name,
 * billboard yang disewa,
-* billboard face yang digunakan,
 * periode mulai,
 * periode selesai,
 * materi iklan,
+* campaign objective,
 * estimated OOH budget,
 * status campaign,
-* proof display requirement,
-* akses dashboard client,
-* report schedule.
-
-Status campaign minimal:
-
-* draft,
-* scheduled,
-* active,
-* paused,
-* completed,
-* cancelled.
-
-Admin Tenant boleh membuat dan mengelola campaign.
-
-Sales boleh membuat draft campaign jika diberikan izin.
-
-Owner Tenant hanya melihat ringkasan campaign.
-
-Client hanya melihat campaign miliknya.
+* dashboard access,
+* report access.
 
 ---
 
-### Modul 7 — AI Traffic Analytics
+## 6.7 AI Traffic Analytics
 
-Modul untuk membaca data kendaraan dari CCTV / CVC.
+Modul untuk membaca data kendaraan dari CCTV.
 
 Fitur:
 
 * vehicle counting,
 * vehicle classification,
 * direction detection,
-* speed estimation,
-* congestion detection,
-* dwell time estimation,
-* peak hour calculation,
+* speed rate,
+* traffic density,
+* congestion level,
+* dwell time,
+* peak hour,
+* real-time summary,
 * hourly summary,
 * daily summary,
-* monthly summary,
-* real-time KPI,
-* anomaly detection,
-* confidence score,
-* data quality score.
+* monthly summary.
 
-Jenis kendaraan minimal:
+Jenis kendaraan minimum:
 
-* motorcycle / motor,
-* car / mobil,
+* motorcycle,
+* car,
 * bus,
-* truck / truk,
-* other vehicle jika diperlukan.
+* truck.
 
-Catatan penting:
+Catatan:
 
-Sistem tidak boleh overclaim.
-
-AI menghitung kendaraan dan peluang exposure, bukan membaca mata manusia.
-
----
-
-### Modul 8 — AI Counting Rule
-
-Modul untuk mengatur aturan hitung AI.
-
-Data utama:
-
-* camera ID,
-* counting line coordinates,
-* direction filter,
-* exposure zone coordinates,
-* vehicle classes,
-* minimum confidence,
-* duplicate tracking window,
-* active status,
-* rule version,
-* validation status.
-
-Aturan penting:
-
-* kendaraan hanya dihitung jika melewati counting line yang valid,
-* arah kendaraan harus sesuai direction rule,
-* kendaraan di luar exposure direction tidak boleh dihitung untuk campaign exposure,
-* potensi double count harus dicegah,
-* perubahan rule harus masuk audit log,
-* setiap report harus menyimpan methodology version dan formula version.
+* pickup dan van dapat masuk kategori truck / light truck sesuai aturan final.
+* data harus punya confidence score.
+* data harus punya data quality score.
+* data estimated harus diberi label.
+* anomaly harus diberi flag.
+* jangan membuat angka tanpa sumber.
 
 ---
 
-### Modul 9 — Proof of Display
+## 6.8 Proof of Display
 
 Modul bukti billboard tayang.
 
-Karena kamera utama biasanya menghadap jalan, bukti tayang untuk billboard statis dapat menggunakan:
+Karena kamera utama umumnya menghadap jalan, proof of display dapat memakai:
 
 * foto pemasangan billboard,
 * timestamp,
@@ -849,70 +585,51 @@ Karena kamera utama biasanya menghadap jalan, bukti tayang untuk billboard stati
 * checklist campaign,
 * catatan maintenance.
 
-Untuk paket premium dapat ditambah kamera khusus proof display.
+Untuk paket premium, dapat ditambah kamera khusus proof display.
 
 Akses:
 
-* Admin Tenant dapat approval.
-* Teknisi dapat upload bukti lapangan.
-* Owner Tenant dapat melihat ringkasan.
-* Client dapat melihat proof yang sudah disetujui.
-
-Status proof minimal:
-
-* pending,
-* approved,
-* rejected,
-* need revision.
+* Teknisi upload proof,
+* Admin Tenant approval proof,
+* Owner Tenant melihat ringkasan,
+* Client melihat proof yang sudah approved.
 
 ---
 
-### Modul 10 — Client Dashboard
+## 6.9 Client Dashboard
 
 Dashboard khusus client penyewa billboard.
 
-Dashboard ini wajib mobile-first.
+Isi utama:
 
-Isi dashboard:
-
-* status campaign,
+* campaign status,
 * periode campaign,
 * lokasi billboard,
 * total kendaraan hari ini,
 * total kendaraan minggu ini,
 * total kendaraan bulan ini,
 * klasifikasi kendaraan,
-* vehicle composition,
 * peak hour,
-* speed rate,
+* average speed,
 * congestion level,
-* estimated potential exposure,
+* estimated exposure,
 * proof display,
-* report harian,
-* report mingguan,
-* report bulanan,
-* download PDF,
-* download Excel jika diizinkan.
+* download report.
 
-Dashboard client harus sederhana, cepat, dan mudah dibaca dari HP.
-
-Client tidak boleh dipaksa membaca tabel panjang seperti sedang menghitung warisan Excel jam 2 malam.
+Client dashboard wajib mobile-first.
 
 ---
 
-### Modul 11 — Owner Tenant Dashboard
+## 6.10 Owner Tenant Dashboard
 
 Dashboard khusus Owner Tenant.
 
-Dashboard ini hanya untuk monitoring bisnis dan report.
-
-Isi dashboard:
+Isi utama:
 
 * total billboard,
-* total billboard aktif,
-* total billboard face,
-* total campaign aktif,
-* total client aktif,
+* billboard aktif,
+* campaign aktif,
+* client aktif,
 * CCTV online,
 * CCTV offline,
 * total estimated exposure bulan ini,
@@ -921,112 +638,93 @@ Isi dashboard:
 * report terbaru,
 * ringkasan performa tenant,
 * grafik trend performa,
-* data quality summary,
-* alert ringkasan.
+* insight bisnis.
 
-Owner Tenant tidak perlu tombol create/edit/delete untuk data operasional.
+Tidak boleh ada tombol:
 
-Dashboard Owner Tenant harus bersih, eksekutif, ringkas, dan mudah dipahami.
+* create,
+* edit,
+* delete,
+* approve,
+* manage user,
+* manage role,
+* manage camera,
+* change subscription.
 
 ---
 
-### Modul 12 — Admin Tenant Dashboard
+## 6.11 Admin Tenant Dashboard
 
-Dashboard khusus Admin Tenant.
+Dashboard operasional tenant.
 
-Isi dashboard:
+Isi utama:
 
-* total billboard,
-* total billboard aktif,
-* total campaign aktif,
-* total client aktif,
+* total vehicle today,
+* total vehicle this month,
+* estimated exposure,
+* active campaign,
+* active billboard,
 * CCTV online,
 * CCTV offline,
-* report belum dikirim,
-* campaign hampir berakhir,
-* billboard traffic tertinggi,
-* total estimated exposure bulan ini,
-* proof pending approval,
-* alert maintenance aktif,
-* data quality issue,
-* missing data hour,
-* anomaly count.
+* data quality score,
+* pending proof approval,
+* report waiting review,
+* alert maintenance,
+* traffic trend,
+* vehicle composition,
+* hourly heatmap,
+* top billboard performance,
+* device health,
+* latest activity.
 
-Admin Tenant boleh melihat KPI sekaligus melakukan aksi operasional.
-
----
-
-### Modul 13 — Owner Platform SaaS Dashboard
-
-Dashboard khusus Owner Platform SaaS.
-
-Isi dashboard:
-
-* total tenant,
-* tenant aktif,
-* tenant trial,
-* tenant suspended,
-* total billboard seluruh platform,
-* total CCTV aktif,
-* total CCTV offline,
-* total campaign berjalan,
-* subscription aktif,
-* subscription bermasalah,
-* MRR/ARR jika billing sudah dibuat,
-* plan/tier terpopuler,
-* system health,
-* error rate,
-* storage usage,
-* API usage,
-* AI processing usage,
-* report generation usage.
-
-Owner Platform SaaS fokus pada kesehatan platform dan bisnis SaaS, bukan operasional harian tenant.
+Admin Tenant boleh melakukan aksi operasional sesuai permission.
 
 ---
 
-### Modul 14 — Report Generator
+## 6.12 Report Center
 
-Modul untuk membuat laporan.
+Modul untuk generate dan mengelola report.
 
-Jenis laporan:
+Jenis report:
 
 * daily report,
 * weekly report,
 * monthly report,
-* campaign summary report,
-* billboard performance report,
-* client report,
-* cross-location comparison report.
+* campaign report,
+* billboard report,
+* client report.
 
-Format output:
+Format:
 
-* dashboard web/mobile,
 * PDF,
 * Excel,
-* CSV raw data jika dibutuhkan.
+* CSV,
+* JSON/API jika nanti dibutuhkan.
 
-Akses report:
+Status report:
 
-* Admin Tenant dapat generate dan download.
-* Owner Tenant dapat melihat/download jika diizinkan.
-* Client dapat melihat/download report campaign miliknya.
-* Owner Platform SaaS dapat melihat report usage secara global, bukan detail bisnis tenant kecuali untuk kebutuhan support/audit resmi.
+* Draft,
+* Generated,
+* Waiting Review,
+* Approved,
+* Sent to Client,
+* Failed,
+* Archived.
 
-Report harus berisi:
+Report harus punya:
 
-* angka,
-* grafik,
-* proof,
-* insight,
-* metodologi,
-* formula,
-* data quality,
-* disclaimer.
+* generated_at,
+* generated_by,
+* report_period,
+* report_version,
+* formula_version,
+* methodology_version,
+* data_quality_summary,
+* audit trace.
 
 ---
 
-### Modul 15 — Alert & Maintenance
+## 6.13 Alert & Maintenance
 
 Modul peringatan teknis.
 
@@ -1040,319 +738,252 @@ Alert utama:
 * campaign belum ada proof,
 * report gagal dibuat,
 * device tidak mengirim heartbeat,
-* missing hours terlalu banyak,
-* confidence score rendah,
-* data quality score rendah,
-* anomaly traffic terdeteksi.
+* data quality rendah,
+* missing hours tinggi,
+* anomaly traffic.
 
-Admin Tenant dan Teknisi mendapat alert operasional.
+Severity:
 
-Owner Tenant hanya melihat ringkasan status.
-
-Owner Platform SaaS melihat alert global platform.
-
----
-
-## 9. KPI Card Utama
+* Critical,
+* High,
+* Medium,
+* Low,
+* Info.
 
 ---
 
-### 9.1 KPI Untuk Client
+# 7. Struktur Dashboard Berdasarkan Role
 
-KPI minimal:
-
-* Campaign Aktif
-* Sisa Hari Campaign
-* Billboard Location
-* Total Kendaraan Hari Ini
-* Total Kendaraan Minggu Ini
-* Total Kendaraan Bulan Ini
-* Estimated Potential Exposure
-* Motor Lewat
-* Mobil Lewat
-* Bus Lewat
-* Truk Lewat
-* Peak Hour
-* Average Speed
-* Congestion Level
-* Proof Display Status
-* CCTV Status
-* Report Terbaru
-
----
-
-### 9.2 KPI Untuk Admin Tenant
-
-KPI minimal:
-
-* Total Billboard
-* Total Billboard Aktif
-* Total Billboard Face
-* Total Campaign Aktif
-* Total Client Aktif
-* CCTV Online
-* CCTV Offline
-* Report Belum Dikirim
-* Campaign Hampir Berakhir
-* Billboard Traffic Tertinggi
-* Total Estimated Exposure Bulan Ini
-* Proof Pending Approval
-* Alert Maintenance Aktif
-* Data Quality Issue
-* Missing Data Hours
-* Anomaly Count
-
-Admin Tenant boleh melihat KPI sekaligus melakukan aksi operasional.
-
----
-
-### 9.3 KPI Untuk Owner Tenant
-
-KPI minimal:
-
-* Total Billboard
-* Total Billboard Aktif
-* Total Campaign Aktif
-* Total Client Aktif
-* CCTV Online
-* CCTV Offline
-* Total Estimated Exposure Bulan Ini
-* Billboard Traffic Tertinggi
-* Campaign Hampir Berakhir
-* Report Terbaru
-* Performance Trend
-* Data Quality Summary
-
-Owner Tenant hanya monitoring.
-
-Tidak ada tombol berbahaya seperti:
-
-* tambah data,
-* edit data,
-* delete data,
-* approval,
-* ubah role,
-* ubah konfigurasi.
-
----
-
-### 9.4 KPI Untuk Owner Platform SaaS
-
-KPI minimal:
-
-* Total Tenant
-* Tenant Aktif
-* Tenant Trial
-* Tenant Suspended
-* Total Billboard Seluruh Platform
-* Total CCTV Aktif
-* Total CCTV Offline
-* Total Campaign Berjalan
-* Subscription Aktif
-* Subscription Bermasalah
-* MRR/ARR jika billing sudah dibuat
-* Plan/Tier Terpopuler
-* System Health
-* Error Rate
-* Storage Usage
-* API Usage
-* AI Processing Usage
-* Report Generation Usage
-
----
-
-## 10. Data Flow Sistem
-
-Alur data utama:
+## 7.1 Sidebar Admin Tenant
 
 ```text
-CCTV / CVC menangkap kondisi jalan
-↓
-Edge device / AI service membaca video stream
-↓
-AI mendeteksi kendaraan
-↓
-AI melakukan tracking object
-↓
-AI menghitung kendaraan berdasarkan counting line
-↓
-AI mengklasifikasi kendaraan: motor, mobil, bus, truk
-↓
-AI menghitung arah, speed, density, congestion jika tersedia
-↓
-Data dikirim ke cloud backend sebagai metadata
-↓
-Backend menyimpan event dan summary
-↓
-Aggregator membuat hourly/daily/monthly summary
-↓
-Formula engine menghitung exposure, CPV, CPI
-↓
-Quality engine menghitung confidence dan data quality score
-↓
-Dashboard menampilkan KPI real-time/ringkas
-↓
-Report harian/mingguan/bulanan dibuat otomatis
-↓
-Admin Tenant mengelola operasional
-↓
-Owner Tenant memonitor KPI dan report
-↓
-Client membuka dashboard mobile
-↓
-Owner Platform SaaS memonitor tenant, tier, subscription, dan system health
+Dashboard
+Traffic Analytics
+Live View / CCTV
+Billboard
+Campaign
+Client / Brand
+Proof of Display
+Report Center
+Device & Camera
+Alert & Maintenance
+Users & Roles
+Settings
+Profile
+Logout
 ```
 
-Sistem harus mengutamakan metadata, bukan menyimpan video mentah terus-menerus.
+---
 
-Video/snapshot hanya disimpan bila dibutuhkan untuk sample, proof, audit, atau debugging.
+## 7.2 Sidebar Owner Tenant
+
+```text
+Executive Dashboard
+Traffic Summary
+Campaign Summary
+Billboard Performance
+CCTV Health Summary
+Report Center
+Insight & Recommendation
+Profile
+Logout
+```
+
+Owner Tenant hanya read-only.
 
 ---
 
-## 11. Output Report
+## 7.3 Sidebar Client
 
-Benchmark report yang harus dikejar aplikasi adalah report traffic bulanan yang menampilkan:
+```text
+My Campaign
+Traffic Performance
+Proof of Display
+Reports
+Live View if Allowed
+Profile
+Logout
+```
 
-* cover,
-* measurement service,
-* penjelasan CVC,
-* network map,
-* location summary,
-* KPI lokasi,
-* traffic chart analysis,
-* hourly data report,
-* recap total,
-* closing/branding.
+Client hanya melihat campaign miliknya.
 
-Namun aplikasi kita harus naik kelas dengan tambahan:
+---
 
-* executive summary,
-* methodology,
+## 7.4 Sidebar Teknisi
+
+```text
+Technical Dashboard
+Assigned Camera
+Device Health
+Maintenance Checklist
+Upload Field Proof
+Incident Report
+Profile
+Logout
+```
+
+---
+
+## 7.5 Sidebar Owner Platform SaaS
+
+```text
+Platform Dashboard
+Tenant Management
+Subscription / Tier
+Platform Usage
+System Health
+Global Device Status
+Billing
+Audit Log
+Feature Flags
+Settings
+Profile
+Logout
+```
+
+---
+
+# 8. Traffic Analytics
+
+Traffic Analytics mengacu pada benchmark manual ADX, tetapi harus lebih lengkap.
+
+Fitur minimum:
+
+* rekap traffic counting,
+* filter Day / Week / Month / Custom,
+* filter lokasi,
+* filter campaign,
+* filter client,
+* filter vehicle class,
+* filter direction,
+* date range picker,
+* export PDF,
+* export CSV,
+* export Excel,
+* chart traffic,
+* table traffic.
+
+Fitur tambahan wajib untuk aplikasi kita:
+
+* daily traffic trend,
+* hourly traffic heatmap,
+* vehicle composition donut,
+* vehicle class trend,
+* weekday vs weekend comparison,
+* CPV / CPI comparison,
+* cumulative exposure,
 * data quality score,
 * confidence score,
-* formula transparency,
-* anomaly explanation,
-* recommendation,
-* raw data appendix,
-* report version,
-* formula version,
-* methodology version,
-* audit trail.
+* anomaly flag,
+* raw / validated / estimated data mode.
 
----
+KPI Analytics:
 
-### 11.1 Daily Report
-
-Isi minimal:
-
-* tanggal report,
-* nama client,
-* nama campaign,
-* billboard location,
-* total kendaraan,
-* kendaraan per jam,
-* klasifikasi kendaraan,
+* total vehicle,
+* total car,
+* total motorcycle,
+* total bus,
+* total truck,
+* estimated exposure,
+* average traffic per day,
 * peak hour,
-* average speed jika tersedia,
-* congestion level jika tersedia,
-* estimated potential exposure,
-* proof display status,
-* CCTV uptime,
-* data quality score,
-* insight harian.
-
----
-
-### 11.2 Weekly Report
-
-Isi minimal:
-
-* periode minggu,
-* total kendaraan 7 hari,
-* grafik traffic harian,
 * peak day,
-* peak hour mingguan,
-* klasifikasi kendaraan,
-* trend speed jika tersedia,
-* trend congestion jika tersedia,
-* proof display summary,
-* data quality summary,
-* insight mingguan.
+* average speed,
+* congestion level,
+* data quality score.
 
 ---
 
-### 11.3 Monthly Report
+# 9. Live View / CCTV
 
-Isi minimal:
+Live View tidak boleh memakai pola raw RTSP yang langsung dibuka user.
 
-* periode bulan,
-* nama client,
-* nama campaign,
-* brand,
-* city/area,
-* total lokasi dipantau,
-* total vehicle traffic,
-* total estimated impression,
-* average daily traffic,
-* CPV,
-* CPI,
-* vehicle composition,
-* grafik mingguan,
-* weekday vs weekend,
-* top peak hour,
-* campaign summary,
-* proof display summary,
-* data integrity,
-* executive insight,
-* recommendation,
-* appendix raw data.
+Fitur Live View:
 
----
+* secure web player,
+* stream proxy,
+* signed token,
+* session expiry,
+* one active stream session per user/camera jika diperlukan,
+* viewer tracking,
+* capture snapshot,
+* report issue,
+* toggle detection overlay,
+* toggle counting line,
+* audit log.
 
-## 12. Struktur Report PDF Final
+Informasi di halaman Live View:
 
-Struktur ideal report PDF:
+* camera name,
+* location,
+* billboard,
+* status online/offline,
+* last heartbeat,
+* stream quality,
+* resolution,
+* FPS,
+* latency,
+* current viewer,
+* session expiry timer,
+* vehicle count now,
+* detection overlay status.
 
-1. Cover
-2. Executive Summary
-3. Campaign Overview
-4. Measurement Methodology
-5. Network Map
-6. Overall KPI Recap
-7. Location 1 Summary
-8. Location 1 Traffic Analysis
-9. Location 1 Hourly Heatmap
-10. Location 1 Data Quality
-11. Location 2 Summary
-12. Location 2 Traffic Analysis
-13. Location 2 Hourly Heatmap
-14. Location 2 Data Quality
-15. Location 3 Summary
-16. Location 3 Traffic Analysis
-17. Location 3 Hourly Heatmap
-18. Location 3 Data Quality
-19. Cross-location Comparison
-20. Cost Efficiency Analysis
-21. Audience & Vehicle Composition Insight
-22. Recommendation
-23. Raw Data Appendix
-24. Disclaimer & Formula Notes
-25. Closing Page
+Larangan:
 
-Report utama harus client-friendly.
-
-Tabel hourly besar tetap boleh ada, tetapi sebaiknya berada di appendix atau file Excel, 
-bukan memenuhi halaman utama seperti tembok angka yang membuat client ingin resign dari membaca.
+* jangan expose raw RTSP ke Client,
+* jangan simpan RTSP plain text,
+* jangan izinkan semua role membuka live stream,
+* jangan buka live stream tanpa audit log.
 
 ---
 
-## 13. Formula Resmi yang Harus Dikunci
+# 10. Data Quality & Anti Overclaim
 
-Aplikasi wajib punya formula resmi.
+Aplikasi ini harus hati-hati dalam menyebut impression.
+
+Gunakan istilah:
+
+* estimated exposure,
+* potential exposure,
+* opportunity to see,
+* potensi iklan terlihat.
+
+Jangan gunakan klaim:
+
+* pasti dilihat,
+* pasti dibaca,
+* pasti menghasilkan penjualan,
+* pasti meningkatkan sales.
+
+Sistem membaca kendaraan dan peluang exposure, bukan membaca mata manusia.
+
+Setiap data traffic harus punya konteks:
+
+* data source,
+* camera ID,
+* counting line,
+* direction rule,
+* exposure zone,
+* confidence score,
+* data quality score,
+* valid hours,
+* missing hours,
+* uptime,
+* anomaly flag,
+* formula version,
+* methodology version.
+
+Kalau data estimated, tampilkan sebagai estimated.
+
+Kalau data quality rendah, tampilkan warning.
+
+Jangan tutupi data jelek dengan desain cantik. Itu namanya dashboard pakai bedak tebal.
 
 ---
 
-### 13.1 Total Vehicle Traffic
+# 11. Formula Dasar
+
+## 11.1 Total Vehicle
 
 ```text
 total_vehicle = car_count + motorcycle_count + bus_count + truck_count
@@ -1360,7 +991,7 @@ total_vehicle = car_count + motorcycle_count + bus_count + truck_count
 
 ---
 
-### 13.2 Average Daily Traffic
+## 11.2 Average Daily Traffic
 
 ```text
 avg_daily_traffic = total_vehicle / campaign_days
@@ -1368,32 +999,30 @@ avg_daily_traffic = total_vehicle / campaign_days
 
 ---
 
-### 13.3 CPV
+## 11.3 CPV
 
 ```text
 cpv = estimated_ooh_budget / total_vehicle
 ```
 
-CPV = Cost per Vehicle.
-
 ---
 
-### 13.4 Estimated Impression / Estimated Potential Exposure
+## 11.4 Estimated Exposure
 
 Versi sederhana:
 
 ```text
-estimated_impression =
+estimated_exposure =
 (car_count × car_occupancy_multiplier)
 + (motorcycle_count × motorcycle_occupancy_multiplier)
 + (bus_count × bus_occupancy_multiplier)
 + (truck_count × truck_occupancy_multiplier)
 ```
 
-Versi lebih matang:
+Versi matang:
 
 ```text
-estimated_impression =
+estimated_exposure =
 vehicle_count
 × occupancy_multiplier
 × visibility_factor
@@ -1401,23 +1030,17 @@ vehicle_count
 × data_quality_adjustment
 ```
 
-Aplikasi wajib menjelaskan formula impression multiplier.
-
-Jangan biarkan angka impression muncul seperti wahyu dari langit marketing.
-
 ---
 
-### 13.5 CPI
+## 11.5 CPI
 
 ```text
-cpi = estimated_ooh_budget / estimated_impression
+cpi = estimated_ooh_budget / estimated_exposure
 ```
-
-CPI = Cost per Impression.
 
 ---
 
-### 13.6 Data Quality Score
+## 11.6 Data Quality Score
 
 Contoh formula awal:
 
@@ -1429,115 +1052,52 @@ data_quality_score =
 + (missing_data_score × 0.15)
 ```
 
-Data quality score harus membantu client memahami seberapa layak data dijadikan dasar laporan.
+Formula final harus dikunci di dokumen AI_CCTV_ANALYTICS_RULES.md dan DATABASE_DESIGN.md.
 
 ---
 
-## 14. Data Integrity
+# 12. Report Output
 
-Aplikasi wajib memiliki halaman atau bagian **Data Integrity** pada report.
+Report PDF aplikasi harus minimal setara benchmark report ADX, tetapi lebih transparan.
 
-Isi minimal:
+Struktur ideal:
 
-* expected hours,
-* valid captured hours,
-* missing hours,
-* camera uptime,
-* average AI confidence,
-* data quality score,
-* anomaly count,
-* downtime note,
-* estimated data note jika ada data yang diestimasi.
+1. Cover
+2. Executive Summary
+3. Campaign Overview
+4. Measurement Methodology
+5. Network Map
+6. Overall KPI Recap
+7. Location Summary
+8. Traffic Analysis
+9. Hourly Heatmap
+10. Vehicle Composition
+11. Cost Efficiency Analysis
+12. Data Quality & Integrity
+13. Proof of Display
+14. Cross-location Comparison
+15. Recommendation
+16. Raw Data Appendix
+17. Disclaimer & Formula Notes
+18. Closing Page
 
-Contoh:
+Report wajib punya:
 
-| Metric             |  Value |
-| ------------------ | -----: |
-| Expected Hours     |    744 |
-| Valid Hours        |    736 |
-| Missing Hours      |      8 |
-| Camera Uptime      |  98.9% |
-| Avg AI Confidence  |  91.4% |
-| Data Quality Score | 94/100 |
-
-Traffic count tanpa quality score itu seperti laporan keuangan tanpa bukti transaksi. 
-Bisa dipercaya? Bisa-bisa cuma dipercaya oleh printer yang mencetaknya.
-
----
-
-## 15. Istilah Penting
-
-### Vehicle Count
-
-Jumlah kendaraan yang terdeteksi melewati counting line.
-
-### Vehicle Classification
-
-Pengelompokan kendaraan berdasarkan jenis:
-
-* motor,
-* mobil,
-* bus,
-* truk,
-* kendaraan lain jika dibutuhkan.
-
-### Peak Hour
-
-Jam dengan jumlah kendaraan tertinggi.
-
-### Average Speed
-
-Estimasi rata-rata kecepatan kendaraan yang melewati area pantau.
-
-### Congestion Level
-
-Level kepadatan lalu lintas.
-
-Contoh:
-
-* lancar,
-* ramai lancar,
-* padat,
-* macet,
-* macet berat.
-
-### Dwell Time
-
-Estimasi durasi kendaraan berada dalam area potensi melihat billboard.
-
-### Exposure Zone
-
-Area jalan di mana kendaraan memiliki peluang melihat billboard.
-
-### Estimated Exposure / Estimated Impression
-
-Estimasi potensi billboard terlihat oleh audiens.
-
-Catatan penting:
-
-Estimated exposure bukan klaim bahwa semua orang pasti melihat iklan.
-
-Gunakan istilah:
-
-* estimated exposure,
-* estimated impression,
-* potential exposure,
-* opportunity to see,
-* potensi iklan terlihat.
-
-Jangan menggunakan klaim absolut seperti:
-
-* pasti dilihat,
-* pasti dibaca,
-* pasti menghasilkan penjualan,
-* pasti meningkatkan omzet,
-* semua orang melihat iklan.
-
-Sistem membaca kendaraan dan peluang exposure, bukan membaca mata manusia.
+* client name,
+* campaign name,
+* brand,
+* city / area,
+* period,
+* report type,
+* generated date,
+* generated by,
+* report version,
+* methodology version,
+* formula version.
 
 ---
 
-## 16. Database Concept Minimal
+# 13. Database High-Level
 
 Tabel utama:
 
@@ -1556,1014 +1116,363 @@ edge_devices
 campaigns
 campaign_billboards
 proof_of_display
-ai_counting_rules
 traffic_events
 traffic_hourly_summaries
 traffic_daily_summaries
 traffic_monthly_summaries
 reports
-report_snapshots
+report_exports
+report_generation_jobs
 notifications
 maintenance_logs
+maintenance_tickets
 subscription_plans
 tenant_subscriptions
 tier_feature_limits
 audit_logs
 system_settings
+user_sessions
+live_stream_sessions
+camera_health_logs
+camera_snapshots
+alert_events
+data_quality_snapshots
 ```
 
-Catatan role database:
+Catatan wajib:
 
-* Owner Platform SaaS tidak terikat sebagai user operasional tenant.
-* Admin Tenant wajib punya tenant_id.
-* Owner Tenant wajib punya tenant_id, tetapi permission-nya read-only.
-* Client wajib terkait dengan tenant dan client/campaign record.
-* Teknisi wajib terkait tenant.
-* Semua tabel operasional tenant wajib punya tenant_id.
-* Semua query tenant wajib difilter berdasarkan tenant_id.
-* Semua aksi penting wajib masuk audit_logs.
-* Report wajib menyimpan formula_version dan methodology_version.
+* semua tabel operasional tenant wajib punya tenant_id,
+* semua query tenant wajib filter tenant_id,
+* Client wajib terkait campaign/client record,
+* Owner Tenant wajib tenant_id tetapi read-only,
+* Owner Platform SaaS tidak dianggap user operasional tenant,
+* semua aksi penting wajib masuk audit_logs.
 
 ---
 
-## 17. Data Traffic Minimal
+# 14. API High-Level
 
-### Hourly Traffic Fact
-
-Field minimal:
+Endpoint utama yang nanti wajib dirancang detail:
 
 ```text
-id
-tenant_id
-campaign_id
-billboard_id
-billboard_face_id
-camera_id
-date
-hour
-car_count
-motorcycle_count
-bus_count
-truck_count
-total_vehicle_count
-estimated_impression
-average_confidence
-data_quality_score
-camera_uptime_minutes
-is_estimated
-anomaly_flag
-created_at
+/auth/login
+/auth/logout
+/auth/me
+
+/platform/tenants
+/platform/plans
+/platform/subscriptions
+/platform/system-health
+
+/analytics/summary
+/analytics/timeseries
+/analytics/vehicle-composition
+/analytics/hourly-heatmap
+/analytics/location/:locationId
+
+/billboards
+/billboards/:id
+
+/campaigns
+/campaigns/:id
+
+/clients
+/clients/:id
+
+/devices
+/devices/:id
+/devices/:id/health
+
+/live-stream/sessions
+/live-stream/sessions/:id
+
+/proof-display
+/proof-display/:id/approve
+
+/reports
+/reports/generate
+/reports/:id/download/pdf
+/reports/:id/download/excel
+/reports/:id/download/csv
+
+/alerts
+/maintenance
+/audit-logs
+/profile
 ```
 
-### Daily Traffic Summary
+Semua endpoint harus:
 
-Field minimal:
-
-```text
-id
-tenant_id
-campaign_id
-billboard_id
-billboard_face_id
-date
-total_car
-total_motorcycle
-total_bus
-total_truck
-total_vehicle
-total_impression
-peak_hour
-quality_score
-anomaly_count
-created_at
-```
-
-### Report Snapshot
-
-Field minimal:
-
-```text
-report_id
-tenant_id
-campaign_id
-generated_at
-generated_by
-report_period
-report_status
-pdf_url
-excel_url
-methodology_version
-formula_version
-approval_status
-approved_by
-approved_at
-```
+* authenticated,
+* role-checked,
+* tenant-filtered,
+* audited untuk aksi penting.
 
 ---
 
-## 18. Prinsip UI/UX
+# 15. MVP Roadmap Ringkas
 
-Aplikasi harus mengikuti prinsip berikut:
+## Phase 1 — Core SaaS Foundation
 
-* mobile-first untuk client,
-* web admin untuk pengelolaan data besar,
-* dashboard ringkas dan cepat dibaca,
-* KPI card harus jelas,
-* grafik tidak boleh membingungkan,
-* report harus profesional,
-* warna dan dekor tidak boleh mengalahkan data,
-* loading harus ringan,
-* data penting harus muncul lebih dulu,
-* client tidak boleh dipaksa membaca tabel panjang,
-* Owner Tenant dashboard harus eksekutif dan read-only,
-* Admin Tenant dashboard boleh operasional,
-* Owner Platform dashboard fokus SaaS/platform.
+Fitur:
 
-Prioritas tampilan:
-
-1. Client mobile dashboard.
-2. Owner Tenant monitoring dashboard.
-3. Admin Tenant web dashboard.
-4. Technician mobile workflow.
-5. Report PDF/Excel.
-6. Dekor visual.
-
-Dekor dilakukan setelah fungsi utama stabil.
-
----
-
-## 19. Prinsip Backend
-
-Backend harus mengikuti prinsip berikut:
-
-* multi-tenant sejak awal,
-* semua data operasional wajib memiliki tenant_id,
-* permission tidak boleh longgar,
-* API harus jelas,
-* validasi input wajib,
-* audit log wajib untuk aksi penting,
-* report harus bisa diregenerate,
-* summary data harus disimpan agar dashboard tidak berat,
-* raw traffic event jangan selalu dipakai langsung untuk dashboard,
-* gunakan aggregation untuk hourly/daily/monthly report,
-* role guard wajib di API dan UI,
-* semua query tenant wajib difilter tenant_id,
-* semua report wajib punya formula version,
-* semua report final wajib punya snapshot.
-
-Data antar tenant tidak boleh bocor.
-
-Ini aturan keras.
-
----
-
-## 20. Prinsip CCTV & AI Analytics
-
-CCTV / CVC digunakan untuk:
-
-* monitoring jalan,
-* vehicle counting,
-* vehicle classification,
-* speed estimation,
-* congestion detection,
-* traffic summary,
-* campaign measurement.
-
-CCTV utama menghadap jalan.
-
-Untuk proof billboard tayang, sistem menggunakan:
-
-* foto pemasangan,
-* GPS timestamp,
-* approval admin,
-* checklist teknisi,
-* foto berkala,
-* optional proof camera untuk paket premium.
-
-AI tidak boleh mengklaim hal yang tidak dihitung.
-
-Sistem membaca kendaraan dan peluang exposure, bukan membaca mata manusia.
-
----
-
-## 21. Privacy & Data Safety
-
-Sistem harus menghindari fitur sensitif yang belum diperlukan.
-
-Pada tahap awal, jangan membangun:
-
-* face recognition,
-* license plate recognition,
-* tracking individu,
-* demographic detection,
-* emotion detection.
-
-Fokus pada data agregat:
-
-* jumlah kendaraan,
-* jenis kendaraan,
-* speed,
-* congestion,
-* exposure estimation.
-
-Data yang disimpan harus secukupnya.
-
-Snapshot dan video sample harus memiliki retention policy.
-
----
-
-## 22. Tech Direction
-
-Tech stack dapat disesuaikan, tetapi prinsip arsitektur tidak boleh berubah.
-
-Rekomendasi arah:
-
-### Backend
-
-* REST API atau hybrid REST + realtime channel.
-* Multi-tenant architecture.
-* Relational database.
-* Background job untuk report dan aggregation.
-* Authentication dan role permission kuat.
-* Formula engine.
-* Report snapshot engine.
-* Audit log.
-
-### Frontend Web Admin
-
-* Dashboard Admin Tenant.
-* Master data.
-* Campaign management.
-* Camera management.
-* Report management.
-* Proof approval.
-* Alert monitoring.
-
-### Owner Tenant Dashboard
-
-* KPI summary.
-* Business insight.
-* Read-only report.
-* Trend performance.
-* CCTV status summary.
-* No dangerous action button.
-
-### Owner Platform Dashboard
-
-* Tenant management.
-* Subscription/tier management.
-* System health.
-* Usage monitoring.
-* Billing status.
-* Global alert.
-
-### Mobile Client
-
-* KPI campaign.
-* Report ringkas.
-* Proof display.
-* Notification.
-* Download report.
-
-### Mobile Technician
-
-* Upload proof.
-* Camera check.
-* Maintenance checklist.
-* GPS timestamp.
-* Issue report.
-
-### AI/Edge Layer
-
-* RTSP input.
-* Vehicle detection.
-* Vehicle classification.
-* Metadata sender.
-* Heartbeat sender.
-* Offline buffer.
-* Counting rule.
-* Confidence scoring.
-
----
-
-## 23. Urutan Pengembangan yang Disarankan
-
-Pengembangan harus dilakukan bertahap.
-
-Jangan langsung membangun semua fitur.
-
----
-
-### Phase 1 — Project Foundation
-
-* setup project,
-* struktur folder,
-* authentication,
-* tenant model,
-* role model,
-* permission seed,
-* basic dashboard.
-
-Target:
-
-Sistem punya pondasi SaaS yang benar.
-
----
-
-### Phase 2 — SaaS Tenant & Role Hardening
-
+* login,
+* multi-tenant,
+* role user,
 * Owner Platform SaaS,
 * Admin Tenant,
 * Owner Tenant read-only,
-* Sales,
-* Teknisi,
-* Client,
+* master tenant,
+* master billboard,
+* master client,
+* campaign dasar,
+* dashboard dasar.
+
+Target:
+
+Aplikasi sudah punya struktur SaaS yang benar.
+
+---
+
+## Phase 2 — Role & Permission Hardening
+
+Fitur:
+
+* permission matrix,
 * tenant isolation,
+* audit log,
 * role-based sidebar,
 * role-based API guard,
-* audit log.
+* client campaign isolation,
+* Owner Tenant read-only hardening.
 
 Target:
 
-Tidak ada role yang salah kuasa.
-
-Kalau role kacau, aplikasi SaaS bisa jadi pasar malam: semua orang pegang kunci loket.
+Tidak ada role salah kuasa.
 
 ---
 
-### Phase 3 — Billboard, Client, Campaign Core
+## Phase 3 — Dashboard & Analytics
 
-* billboard management,
-* billboard face,
-* client management,
-* campaign management,
-* assign campaign to billboard face,
-* campaign period,
-* campaign status.
+Fitur:
+
+* Admin Tenant dashboard,
+* Owner Tenant dashboard,
+* Client dashboard mobile,
+* Traffic Analytics,
+* Day / Week / Month / Custom filter,
+* location filter,
+* vehicle breakdown,
+* chart traffic,
+* export PDF / CSV / Excel.
 
 Target:
 
-Sistem sudah bisa mengelola inventory dan campaign.
+Dashboard dasar siap dipakai client dan tenant.
 
 ---
 
-### Phase 4 — Proof Display & Basic Report
+## Phase 4 — Device & Live View
 
-* upload proof display,
+Fitur:
+
+* device list,
+* camera status,
+* last heartbeat,
+* camera health,
+* secure live view,
+* signed stream token,
+* session expiry,
+* snapshot,
+* audit live access.
+
+Target:
+
+CCTV bisa dimonitor aman tanpa raw RTSP bocor.
+
+---
+
+## Phase 5 — Proof Display & Report Center
+
+Fitur:
+
+* upload proof,
 * approval proof,
-* report sederhana,
-* export PDF,
-* export Excel dasar,
-* report snapshot.
+* report generator,
+* report history,
+* PDF export,
+* Excel export,
+* CSV export,
+* report status.
 
 Target:
 
-Client sudah bisa mendapat bukti campaign berjalan.
+Client bisa menerima bukti campaign berjalan dan report resmi.
 
 ---
 
-### Phase 5 — CCTV & Device Monitoring
+## Phase 6 — AI Traffic Counting
 
-* register camera,
-* register edge device,
-* heartbeat,
-* camera online/offline,
-* stream health,
-* alert kamera mati.
+Fitur:
 
-Target:
-
-Perusahaan billboard bisa memonitor kesehatan CCTV.
-
----
-
-### Phase 6 — AI Traffic Count & Summary
-
-* vehicle count,
+* vehicle counting,
+* car / motorcycle / bus / truck classification,
 * hourly summary,
 * daily summary,
-* chart traffic,
-* KPI kendaraan,
-* basic confidence score.
+* traffic chart,
+* KPI kendaraan.
 
 Target:
 
-Client mulai mendapatkan data traffic aktual.
+Dashboard mulai memakai data traffic aktual.
 
 ---
 
-### Phase 7 — Vehicle Classification, Speed, Congestion
+## Phase 7 — Data Quality & Intelligence
 
-* motor,
-* mobil,
-* bus,
-* truk,
-* speed rate,
-* congestion level,
-* dwell time,
-* peak hour,
-* exposure zone.
+Fitur:
 
-Target:
-
-Report lebih bernilai bisnis.
-
----
-
-### Phase 8 — Formula, CPV, CPI, Data Quality
-
-* formula engine,
-* estimated impression,
-* CPV,
-* CPI,
+* confidence score,
 * data quality score,
 * anomaly flag,
-* methodology version,
-* formula version.
-
-Target:
-
-Report tidak menjadi angka sulap.
-
----
-
-### Phase 9 — Client Dashboard Mobile-First
-
-* login client,
-* lihat campaign,
-* KPI card,
-* report harian/mingguan/bulanan,
-* proof display,
-* mobile chart,
-* download report.
-
-Target:
-
-Produk punya pembeda kuat: client bisa melihat performa billboard dari HP.
-
----
-
-### Phase 10 — Report PDF/Excel Premium
-
-* monthly report,
-* executive summary,
-* methodology,
-* network map,
-* location KPI,
-* traffic chart,
-* heatmap,
-* data integrity,
-* cross-location comparison,
-* recommendation,
-* appendix raw data.
-
-Target:
-
-Output report minimal setara benchmark, idealnya lebih transparan dan lebih profesional.
-
----
-
-### Phase 11 — Technician Workflow
-
-* mobile technician dashboard,
-* upload proof,
-* camera check,
-* maintenance log,
-* issue report,
-* GPS timestamp.
-
-Target:
-
-Operasional lapangan terkoneksi ke sistem.
-
----
-
-### Phase 12 — UI Polish & Decoration
-
-* UI polish,
-* responsive tuning,
-* loading states,
-* empty states,
-* microcopy,
-* visual improvement,
-* PDF design polishing.
-
-Target:
-
-Aplikasi enak dipakai dan report enak dilihat.
-
----
-
-### Phase 13 — Audit, Testing, Production Readiness
-
-* security audit,
-* tenant isolation audit,
-* permission audit,
-* performance audit,
-* report accuracy audit,
-* camera data audit,
-* data quality audit,
-* mobile UI audit,
-* production checklist.
-
-Target:
-
-Siap production, bukan sekadar “jalan di laptop saya.”
-
----
-
-## 24. Aturan Keras untuk Agent / Developer
-
----
-
-### 24.1 Wajib Membaca Dokumen
-
-Sebelum coding, agent wajib membaca:
-
-* README.md,
-* PROJECT_VISION_BUSINESS_RULES.md,
-* SYSTEM_ARCHITECTURE.md,
-* DATABASE_DESIGN.md,
-* AI_CCTV_ANALYTICS_RULES.md,
-* API_CONTRACTS_AND_EVENT_PIPELINE.md,
-* UI_UX_DASHBOARD_REPORTING_GUIDE.md,
-* SECURITY_PRIVACY_ACCESS_CONTROL.md,
-* ROADMAP.md,
-* TODO.md jika sudah ada.
-
-Jika dokumen belum tersedia, agent harus mengikuti README.md ini sebagai sumber utama sementara.
-
----
-
-### 24.2 Tidak Boleh Mengubah Arah Produk
-
-Agent tidak boleh mengubah produk menjadi:
-
-* aplikasi CCTV biasa,
-* aplikasi single-company,
-* aplikasi report manual saja,
-* aplikasi website admin saja,
-* aplikasi tanpa multi-tenant,
-* aplikasi tanpa client dashboard,
-* aplikasi tanpa proof display,
-* aplikasi tanpa arah SaaS,
-* aplikasi tanpa formula transparency,
-* aplikasi tanpa role permission yang jelas.
-
-Arah produk wajib tetap:
-
-**SaaS Billboard Monitoring & Report Platform.**
-
----
-
-### 24.3 Tidak Boleh Mencampur Data Tenant
-
-Semua fitur yang berhubungan dengan tenant wajib aman.
-
-Agent wajib memastikan:
-
-* tenant A tidak melihat data tenant B,
-* client A tidak melihat campaign client B,
-* technician hanya melihat lokasi yang ditugaskan,
-* report hanya mengambil data sesuai tenant dan client,
-* API tidak mengembalikan data lintas tenant,
-* file storage dipisahkan berdasarkan tenant context,
-* export report tidak bocor antar tenant.
-
-Tenant isolation adalah aturan inti.
-
----
-
-### 24.4 Tidak Boleh Membuat Role Salah Kuasa
-
-Aturan role wajib:
-
-* Owner Platform SaaS mengatur platform, tenant, subscription, dan tier.
-* Admin Tenant mengatur operasional tenant.
-* Owner Tenant hanya monitoring/read-only.
-* Client hanya melihat campaign miliknya.
-* Teknisi hanya untuk maintenance/proof lapangan.
-* Sales hanya untuk jualan dan draft terbatas.
-
-Owner Tenant tidak boleh diam-diam diberi tombol admin.
-
-Admin Tenant tidak boleh diam-diam jadi Owner Platform.
-
-Client tidak boleh melihat data client lain.
-
----
-
-### 24.5 Tidak Boleh Membuat Fitur Asal Jadi
-
-Setiap fitur wajib memperhatikan:
-
-* data model,
-* permission,
-* UI,
-* validation,
-* error handling,
-* empty state,
-* loading state,
-* audit log bila perlu,
-* report impact,
-* mobile impact.
-
-Jangan membuat fitur hanya tampil di UI tetapi tidak terhubung dengan data asli.
-
-Jangan membuat mock permanen.
-
-Jangan meninggalkan dummy data tanpa label jelas.
-
----
-
-### 24.6 Tidak Boleh Overclaim Data
-
-Report tidak boleh menyatakan bahwa iklan pasti dilihat oleh semua orang.
-
-Gunakan istilah:
-
+* missing hours,
+* uptime score,
+* estimated data label,
+* methodology notes,
+* CPV,
+* CPI,
 * estimated exposure,
-* estimated impression,
-* potential exposure,
-* opportunity to see,
-* potensi iklan terlihat.
+* recommendation engine awal.
 
-Hindari:
+Target:
 
-* pasti dilihat,
-* pasti dibaca,
-* pasti menghasilkan penjualan,
-* pasti meningkatkan omzet,
-* semua orang melihat iklan.
+Aplikasi naik kelas dari traffic dashboard menjadi intelligence platform.
 
 ---
 
-### 24.7 Wajib Menjaga Mobile-First untuk Client
+# 16. Dokumentasi Proyek
 
-Client dashboard wajib nyaman di HP.
-
-Agent tidak boleh hanya membuat tampilan desktop lalu membiarkan mobile berantakan.
-
-Prioritas client:
-
-* KPI cepat dibaca,
-* grafik ringkas,
-* report mudah diakses,
-* proof display mudah dilihat,
-* tombol download jelas,
-* tidak terlalu banyak tabel panjang.
-
----
-
-### 24.8 Wajib Update TODO dan Roadmap
-
-Saat implementasi sudah dimulai, agent wajib menggunakan:
-
-* TODO.md,
-* ROADMAP.md.
-
-Setiap selesai mengerjakan phase atau task penting:
-
-* checklist task yang selesai,
-* tulis output yang dihasilkan,
-* tulis file yang berubah,
-* tulis catatan risiko,
-* tulis rekomendasi langkah berikutnya.
-
-Ini penting karena proses development bisa terputus akibat listrik, internet, atau session agent berhenti.
-
----
-
-### 24.9 Wajib Audit Berkala
-
-Agent wajib melakukan audit berkala terhadap:
-
-* orphan code,
-* mock data,
-* unused component,
-* unused API,
-* permission leak,
-* tenant isolation issue,
-* slow query,
-* oversized payload,
-* broken mobile UI,
-* broken report,
-* inconsistent naming,
-* formula mismatch,
-* report overclaim,
-* missing audit log,
-* missing data quality.
-
-Audit bukan dilakukan hanya di akhir.
-
-Audit harus dilakukan setiap selesai phase besar.
-
----
-
-## 25. Batasan MVP
-
-MVP tidak perlu langsung membangun semua fitur enterprise.
-
-Fitur yang tidak wajib di MVP awal:
-
-* face recognition,
-* license plate recognition,
-* demographic detection,
-* emotion detection,
-* full video storage 24/7,
-* programmatic ads,
-* public billboard marketplace,
-* AI pricing otomatis,
-* payment gateway kompleks,
-* white label penuh.
-
-MVP harus fokus pada:
-
-* SaaS tenant,
-* role permission yang benar,
-* Owner Platform SaaS,
-* Admin Tenant,
-* Owner Tenant read-only,
-* billboard management,
-* client management,
-* campaign management,
-* proof display,
-* CCTV monitoring,
-* traffic count,
-* client dashboard,
-* basic report,
-* formula CPV/CPI,
-* estimated exposure,
-* data quality basic.
-
----
-
-## 26. Struktur Folder yang Disarankan
-
-Struktur final dapat menyesuaikan tech stack.
-
-Contoh konsep umum:
+Dokumen pondasi yang harus disiapkan / diperbarui:
 
 ```text
-project-root/
-├── docs/
-│   ├── README.md
-│   ├── PROJECT_VISION_BUSINESS_RULES.md
-│   ├── SYSTEM_ARCHITECTURE.md
-│   ├── DATABASE_DESIGN.md
-│   ├── AI_CCTV_ANALYTICS_RULES.md
-│   ├── API_CONTRACTS_AND_EVENT_PIPELINE.md
-│   ├── UI_UX_DASHBOARD_REPORTING_GUIDE.md
-│   ├── SECURITY_PRIVACY_ACCESS_CONTROL.md
-│   └── ROADMAP.md
-│
-├── backend/
-│   ├── app/
-│   ├── api/
-│   ├── models/
-│   ├── services/
-│   ├── jobs/
-│   ├── reports/
-│   └── tests/
-│
-├── frontend-admin/
-│   ├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-│
-├── mobile-client/
-│   ├── src/
-│   ├── screens/
-│   ├── components/
-│   └── services/
-│
-├── mobile-technician/
-│   ├── src/
-│   ├── screens/
-│   ├── components/
-│   └── services/
-│
-├── edge-ai/
-│   ├── camera/
-│   ├── detection/
-│   ├── tracking/
-│   ├── metadata/
-│   └── heartbeat/
-│
-├── reports/
-├── scripts/
-├── tests/
-├── TODO.md
-└── CHANGELOG.md
-```
-
-Jika project dimulai lebih sederhana, struktur boleh disederhanakan.
-
-Namun pemisahan konsep backend, frontend, mobile, edge AI, reports, dan docs tetap harus jelas.
-
----
-
-## 27. Definition of Done
-
-Sebuah fitur dianggap selesai jika memenuhi:
-
-* data model jelas,
-* API berjalan,
-* UI terhubung ke data asli,
-* permission benar,
-* tenant isolation aman,
-* validasi input ada,
-* error handling ada,
-* empty state ada,
-* loading state ada,
-* mobile view aman,
-* tidak ada mock permanen,
-* tidak bocor antar tenant,
-* perubahan dicatat di TODO/roadmap,
-* fitur diuji minimal secara manual,
-* tidak merusak fitur lain.
-
-Untuk fitur penting seperti report, campaign, tenant, role, dan permission, pengujian harus lebih ketat.
-
----
-
-## 28. Risiko Utama Project
-
-Risiko yang harus diperhatikan:
-
-* tenant data bocor,
-* role salah kuasa,
-* Owner Tenant berubah jadi admin diam-diam,
-* CCTV offline terlalu sering,
-* AI counting tidak akurat,
-* report overclaim,
-* formula impression tidak transparan,
-* data quality tidak dihitung,
-* dashboard terlalu berat,
-* mobile UI tidak nyaman,
-* database summary tidak dirancang dari awal,
-* video storage membengkak,
-* permission terlalu longgar,
-* agent meninggalkan mock/dummy/orphan code,
-* report PDF terlalu padat dan tidak client-friendly.
-
-Setiap risiko harus dicegah sejak desain, bukan ditambal setelah rusak.
-
----
-
-## 29. Roadmap Ringkas
-
-Roadmap detail akan ditulis di dokumen:
-
-```text
+README.md
+PROJECT_VISION_BUSINESS_RULES.md
+SYSTEM_ARCHITECTURE.md
+DATABASE_DESIGN.md
+AI_CCTV_ANALYTICS_RULES.md
+API_CONTRACTS_AND_EVENT_PIPELINE.md
+UI_UX_DASHBOARD_REPORTING_GUIDE.md
+SECURITY_PRIVACY_ACCESS_CONTROL.md
 ROADMAP.md
 ```
 
-Ringkasan roadmap:
+Enam dokumen yang sedang diprioritaskan update setelah benchmark dashboard ADX:
 
 ```text
-Phase 1  - Project Foundation
-Phase 2  - SaaS Tenant & Role Hardening
-Phase 3  - Billboard, Client, Campaign Core
-Phase 4  - Proof Display & Basic Report
-Phase 5  - CCTV & Device Monitoring
-Phase 6  - AI Traffic Count & Summary
-Phase 7  - Vehicle Classification, Speed, Congestion
-Phase 8  - Formula, CPV, CPI, Data Quality
-Phase 9  - Client Dashboard Mobile-First
-Phase 10 - Report PDF/Excel Premium
-Phase 11 - Technician Workflow
-Phase 12 - UI Polish & Decoration
-Phase 13 - Audit, Testing, Production Readiness
+README.md
+UI_UX_DASHBOARD_REPORTING_GUIDE.md
+SECURITY_PRIVACY_ACCESS_CONTROL.md
+API_CONTRACTS_AND_EVENT_PIPELINE.md
+DATABASE_DESIGN.md
+ROADMAP.md
 ```
 
----
-
-## 30. Dokumen Lanjutan
-
-Setelah README.md, dokumen berikutnya yang harus dibuat atau diperkuat:
-
-### 30.1 PROJECT_VISION_BUSINESS_RULES.md
-
-Berisi:
-
-* visi produk,
-* target market,
-* model SaaS,
-* paket subscription,
-* paket billboard,
-* aturan campaign,
-* aturan proof display,
-* aturan report,
-* batasan klaim data,
-* formula CPV/CPI/exposure,
-* role utama.
-
-### 30.2 SYSTEM_ARCHITECTURE.md
-
-Berisi:
-
-* arsitektur backend,
-* frontend,
-* mobile app,
-* edge AI,
-* CCTV data flow,
-* report job,
-* realtime data,
-* storage,
-* deployment.
-
-### 30.3 DATABASE_DESIGN.md
-
-Berisi:
-
-* tabel inti,
-* relasi antar tabel,
-* tenant isolation,
-* role permission,
-* campaign structure,
-* traffic summary,
-* proof display,
-* report files,
-* audit logs,
-* formula version,
-* methodology version.
-
-### 30.4 AI_CCTV_ANALYTICS_RULES.md
-
-Berisi:
-
-* vehicle counting rule,
-* classification rule,
-* speed estimation,
-* congestion rule,
-* dwell time,
-* exposure zone,
-* confidence score,
-* data quality score,
-* anomaly detection,
-* larangan overclaim.
-
-### 30.5 API_CONTRACTS_AND_EVENT_PIPELINE.md
-
-Berisi:
-
-* API contract,
-* event payload,
-* traffic event,
-* hourly summary,
-* report generation pipeline,
-* device heartbeat,
-* alert pipeline,
-* webhook jika diperlukan.
-
-### 30.6 UI_UX_DASHBOARD_REPORTING_GUIDE.md
-
-Berisi:
-
-* mobile-first dashboard,
-* KPI card,
-* chart,
-* report layout,
-* PDF format,
-* Excel format,
-* empty state,
-* loading state,
-* visual style,
-* role-based dashboard.
-
-### 30.7 SECURITY_PRIVACY_ACCESS_CONTROL.md
-
-Berisi:
-
-* tenant isolation,
-* permission matrix,
-* API guard,
-* file access,
-* audit log,
-* privacy,
-* data retention,
-* larangan face/license plate recognition di MVP.
-
-### 30.8 ROADMAP.md
-
-Berisi:
-
-* phase development,
-* checklist,
-* aturan TODO.md,
-* aturan update progress,
-* audit per phase,
-* production checklist.
+README ini adalah peta utama. Detail teknis lengkap harus diletakkan di dokumen masing-masing.
 
 ---
 
-## 31. Kesimpulan
+# 17. Development Rules untuk Agent / Developer
 
-Aplikasi ini adalah **SaaS Billboard Monitoring & Report Platform** yang menggabungkan billboard inventory, 
-CCTV/CVC monitoring, AI traffic analytics, proof display, client dashboard, Owner Tenant dashboard, 
-Admin Tenant dashboard, subscription/tier management, report otomatis, formula transparency, dan data quality control.
+Aturan keras:
+
+* Jangan membuat fitur di luar roadmap tanpa alasan.
+* Jangan membuat role baru tanpa update permission matrix.
+* Jangan membuat dashboard tanpa role guard.
+* Jangan membuat API tanpa tenant guard.
+* Jangan membuat export report tanpa audit log.
+* Jangan expose raw RTSP ke frontend client.
+* Jangan menyimpan password plain text.
+* Jangan menampilkan credential di dokumentasi.
+* Jangan membuat angka traffic dummy tanpa label dummy/simulation.
+* Jangan membuat impression seolah pasti dilihat manusia.
+* Jangan menghapus field data quality / confidence dari rancangan.
+* Jangan menjadikan tabel hourly besar sebagai UI utama.
+* Jangan membuat Owner Tenant punya tombol operasional.
+* Jangan membuat Client melihat data client lain.
+* Jangan membangun UI cantik tetapi data tidak bisa diaudit.
+
+Aturan positif:
+
+* Mulai dari MVP yang bisa dijual.
+* Buat dashboard yang jelas dan ringan.
+* Pakai mobile-first untuk Client.
+* Pakai web admin untuk data besar.
+* Pisahkan raw data dan executive summary.
+* Buat export PDF untuk client.
+* Buat Excel/CSV untuk data mentah.
+* Selalu tampilkan status data.
+* Selalu tampilkan sumber data.
+* Selalu simpan audit trail.
+* Selalu pikirkan tenant isolation.
+
+---
+
+# 18. Non-Goals Tahap Awal
+
+Hal yang tidak dikerjakan di awal:
+
+* facial recognition,
+* demographic detection,
+* membaca mata manusia,
+* klaim orang pasti melihat billboard,
+* prediksi sales langsung dari billboard,
+* dynamic pricing otomatis yang kompleks,
+* marketplace billboard publik,
+* mobile app native,
+* billing payment gateway kompleks,
+* AI recommendation terlalu canggih,
+* multi-country support.
+
+Tahap awal fokus Indonesia dan fokus pada aplikasi yang stabil, aman, bisa dipakai, dan bisa menghasilkan report.
+
+---
+
+# 19. Positioning Produk
+
+Platform ini membantu perusahaan billboard memberikan bukti performa iklan kepada client melalui CCTV AI, traffic analytics, proof display, report otomatis, dan dashboard mobile real-time.
+
+Kalimat positioning:
+
+> Billboard Monitoring & Report Platform untuk perusahaan outdoor advertising yang ingin menjual titik iklan dengan data traffic, proof tayang, dan report profesional.
+
+Versi pendek:
+
+> Dari papan iklan menjadi media yang terukur.
+
+Versi galak:
+
+> Jangan jual “katanya ramai”. Jual dengan data.
+
+---
+
+# 20. Kesimpulan
+
+Aplikasi ini adalah SaaS Billboard Monitoring & Report Platform yang menggabungkan:
+
+* tenant management,
+* subscription / tier management,
+* user role management,
+* billboard inventory,
+* camera management,
+* AI traffic analytics,
+* proof of display,
+* client dashboard,
+* owner tenant dashboard,
+* admin tenant dashboard,
+* report center,
+* alert & maintenance,
+* data quality,
+* audit trail.
 
 Struktur role utama yang benar:
 
@@ -2579,12 +1488,4 @@ Sales / Teknisi / Client
 
 Tujuan akhirnya adalah membantu perusahaan billboard menjual titik iklan dengan data, bukan sekadar klaim lokasi ramai.
 
-Role harus benar sejak awal.
-
-Formula harus jelas.
-
-Report harus bisa diaudit.
-
-Data harus punya kualitas.
-
-Karena dalam SaaS, permission itu pondasi. Kalau pondasi miring, dashboard secantik apa pun tetap rawan roboh.
+Permission adalah pondasi. Kalau pondasi miring, dashboard secantik apa pun tetap rawan roboh.
